@@ -59,7 +59,7 @@
                   (swap! items assoc (:output_index ev) (:item ev))
                   "response.completed"
                   (let [response (:response ev)
-                        output (vec (or (:output response) (vals @items)))
+                        output (vec (or (seq (:output response)) (vals @items)))
                         calls (mapv tool-event (filter #(= "function_call" (:type %)) output))]
                     (doseq [call calls] (emit call))
                     (reset! terminal? true)
