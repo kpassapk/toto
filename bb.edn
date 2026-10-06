@@ -11,6 +11,6 @@
          repl {:doc "Start an nREPL" :task (babashka.tasks/clojure "-M:nrepl")}
          test {:doc "Run tests"
                :extra-paths ["test"]
-               :requires ([clojure.test :as t] [toto.agent-test])
-               :task (let [{:keys [fail error]} (t/run-tests 'toto.agent-test)]
+               :requires ([clojure.test :as t] [toto.agent-test] [toto.openai-test])
+               :task (let [{:keys [fail error]} (t/run-tests 'toto.agent-test 'toto.openai-test)]
                        (System/exit (if (pos? (+ fail error)) 1 0)))}}}
