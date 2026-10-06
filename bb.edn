@@ -1,0 +1,16 @@
+{:paths ["src"]
+ :deps  {de.timokramer/charm.clj {:mvn/version "0.2.71"}
+         org.babashka/sci        {:mvn/version "0.13.52"}
+         com.lambdaisland/launchpad {:mvn/version "0.49.220-alpha"}}
+ :tasks {run  {:doc "Run toto (headless Phase 1 driver)"
+               :requires ([toto.headless])
+               :task (apply toto.headless/-main *command-line-args*)}
+         tui  {:doc "Run toto TUI (charm.clj)"
+               :requires ([toto.app])
+               :task (apply toto.app/-main *command-line-args*)}
+         repl {:doc "Start an nREPL" :task (babashka.tasks/clojure "-M:nrepl")}
+         test {:doc "Run tests"
+               :extra-paths ["test"]
+               :requires ([clojure.test :as t] [toto.agent-test])
+               :task (let [{:keys [fail error]} (t/run-tests 'toto.agent-test)]
+                       (System/exit (if (pos? (+ fail error)) 1 0)))}}}
