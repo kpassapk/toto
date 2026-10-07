@@ -13,7 +13,7 @@
    [clojure.core.async :as a]
    [clojure.string :as str]
    [toto.agent :as agent]
-   [toto.llm.anthropic :as anthropic]
+   [toto.llm.providers :as providers]
    [toto.llm.core :as llm]
    [toto.prompt :as prompt]
    [toto.tools.builtin :as builtin]
@@ -201,14 +201,14 @@
    :view view})
 
 (defn run [opts]
-  (let [provider (anthropic/make (select-keys opts [:model :max-tokens]))
+  (let [provider (providers/make opts)
         runtime {:provider provider
                  :ctx {:cwd (System/getProperty "user.dir")}
                  :deltas (atom nil)}]
-    (prog/run (program runtime opts))))
+    (prog/run (program runtime (merge opts (select-keys provider [:model :max-tokens]))))))
 
 (defn -main [& _args]
-  (let [provider (anthropic/make {})]
+  (let [provider (providers/make {})]
     (if (str/blank? (:api-key provider))
-      (println "ANTHROPIC_API_KEY not set.")
+      (println "API key not set. Set ANTHROPIC_API_KEY or OPENAI_API_KEY for TOTO_PROVIDER.")
       (do (run {}) (println "\ntoto: bye.")))))

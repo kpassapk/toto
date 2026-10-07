@@ -52,10 +52,12 @@
               {:id (:id ev) :name (:name ev) :args (:args ev)})
    []])
 
-(defn- on-done [state _]
+(defn- on-done [state ev]
   (let [{:keys [text tool-calls]} (:pending state)
         state' (-> state
-                   (update :history conj (llm/assistant-msg text tool-calls))
+                   (update :history conj (cond-> (llm/assistant-msg text tool-calls)
+                                          (seq (:provider-items ev))
+                                          (assoc :provider-items (:provider-items ev))))
                    (assoc :pending nil))]
     (if (seq tool-calls)
       [(assoc state' :status :running-tools

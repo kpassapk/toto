@@ -8,7 +8,7 @@
   (:require
    [clojure.string :as str]
    [toto.agent :as agent]
-   [toto.llm.anthropic :as anthropic]
+   [toto.llm.providers :as providers]
    [toto.llm.core :as llm]
    [toto.prompt :as prompt]
    [toto.tools.builtin :as builtin]
@@ -61,11 +61,11 @@
                :max-tokens (or max-tokens 4096)}))
 
 (defn -main [& _args]
-  (let [provider (anthropic/make)
+  (let [provider (providers/make)
         ctx {:cwd (System/getProperty "user.dir")}
-        state-atom (atom (init-state {}))]
+        state-atom (atom (init-state (select-keys provider [:model :max-tokens])))]
     (if (str/blank? (:api-key provider))
-      (println "ANTHROPIC_API_KEY not set.")
+      (println "API key not set. Set ANTHROPIC_API_KEY or OPENAI_API_KEY for TOTO_PROVIDER.")
       (do
         (println "toto headless —" (get-in @state-atom [:config :model])
                  "· type a task, ctrl-d to quit.")
